@@ -9,7 +9,6 @@ URL_BASE = os.getenv("url")
 report_url_appendices = ["ReportViewer.aspx?reportId=67&report=DE01_Policies",
                          "ReportViewer.aspx?reportId=169&report=DE02_Leads_Full",
                          "ReportViewer.aspx?reportId=161&report=S26_TimeToCall",
-                         "ReportViewer.aspx?reportId=69&report=DE03_DiaryItems",
                          "ReportViewer.aspx?reportId=67&report=DE01_Policies",
                          "ReportViewer.aspx?reportId=172&report=CM08_Rider_Upgrade"
                          ]

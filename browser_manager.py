@@ -26,7 +26,7 @@ class Browser:
         self.tabs = []
 
     @log_decorator
-    def load_cz_compass(self, loc=str):
+    def load_cz_compass(self, loc: str):
         url = f"{URL}{loc}"
         self.driver.get(url=url)
 
@@ -43,7 +43,7 @@ class Browser:
         submit_button.click()
 
     @log_decorator
-    def open_tabs(self, tab_count=int):
+    def open_tabs(self, tab_count: int):
         for i in range(tab_count):
             self.driver.execute_script("window.open()")
             self.driver.switch_to.window(self.driver.window_handles[i + 1])
