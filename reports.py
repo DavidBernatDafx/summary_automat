@@ -178,3 +178,50 @@ class S26:
                 break
             else:
                 time.sleep(5)
+
+
+class Cm08:
+
+    def __init__(self, driver, data: dict, start_date: str, end_date: str, location: str):
+        self.start_date = start_date
+        self.end_date = end_date
+        self.location = location
+        self.driver = driver
+        self.driver.switch_to.window(data["tab"])
+        self.elements = {}
+        self.find_form_elements()
+        self.fill_form()
+        self.save_report()
+
+    @log_decorator
+    def find_form_elements(self):
+        self.elements = {
+            "start_date_field": self.driver.find_element(by=By.ID, value="ReportViewer1_ctl08_ctl03_txtValue"),
+            "end_date_field": self.driver.find_element(by=By.ID, value="ReportViewer1_ctl08_ctl05_txtValue"),
+            "submit_button": self.driver.find_element(by=By.ID, value="ReportViewer1_ctl08_ctl00")
+        }
+
+    @log_decorator
+    def fill_form(self):
+        ActionChains(self.driver).double_click(self.elements["start_date_field"]).send_keys(Keys.DELETE).perform()
+        self.elements["start_date_field"].send_keys(self.start_date)
+        self.elements["end_date_field"].send_keys(self.end_date)
+        self.elements["submit_button"].click()
+        time.sleep(1)
+
+    @log_decorator
+    def save_report(self):
+        save_button = self.driver.find_element(by=By.ID, value="ReportViewer1_ctl09_ctl04_ctl00_ButtonImgDown")
+        # trigger = self.driver.find_element(by=By.ID, value="ReportViewer1_ctl09_ctl00_TotalPages").text.strip(" ?")
+        save_button.click()
+        while True:
+            trigger = self.driver.find_element(by=By.ID, value="ReportViewer1_ctl09_ctl00_TotalPages").text.strip(" ?")
+            print(trigger)
+            if trigger != "0":
+                print("Report is generated.")
+                save_button.click()
+                ActionChains(self.driver).send_keys(Keys.ARROW_DOWN).send_keys(Keys.ENTER).perform()
+                print("Saving report.")
+                break
+            else:
+                time.sleep(5)

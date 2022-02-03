@@ -7,7 +7,7 @@ yesterday = now - timedelta(days=1)
 yesterday_rider = yesterday + timedelta(days=1)
 month_start = yesterday.replace(day=1)
 year_start = yesterday.replace(day=1, month=1)
-year_rider = year_start.replace(month=7)
+year_rider = year_start.replace(month=1)
 
 
 class Dates:

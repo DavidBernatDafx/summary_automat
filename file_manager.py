@@ -17,6 +17,8 @@ class FileManager:
         self.renamed_source = f"D:/4life/data/{dest_file}"
         print(self.renamed_source)
         self.destination = f"D:/4life/summary_source/{dest_file}"
+        self.rename_file()
+        self.move_file()
 
     @log_decorator
     def rename_file(self):
