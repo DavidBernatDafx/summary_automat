@@ -11,7 +11,7 @@ load_dotenv("_env/.env")
 URL = os.getenv("url")
 USERNAME = os.getenv("username")
 CZ_PASSWORD = os.getenv("cz_pass")
-SK_COMPASS = os.getenv("sk_pass")
+SK_PASSWORD = os.getenv("sk_pass")
 DRIVER_PATH = os.getenv("driver_path")
 
 
@@ -31,6 +31,11 @@ class Browser:
         self.driver.get(url=url)
 
     @log_decorator
+    def load_sk_compass(self, loc: str):
+        url = f"{URL}{loc}"
+        self.driver.get(url=url)
+
+    @log_decorator
     def login_cz(self):
         time.sleep(1)
         user_inputs = self.driver.find_elements(by=By.TAG_NAME, value="input")
@@ -39,7 +44,19 @@ class Browser:
         submit_button = self.driver.find_element(by=By.ID, value="btnLogin")
 
         username.send_keys(USERNAME)
-        password.send_keys(CZ_PASSWORD)
+        password.send_keys(SK_PASSWORD)
+        submit_button.click()
+
+    @log_decorator
+    def login_sk(self):
+        time.sleep(1)
+        user_inputs = self.driver.find_elements(by=By.TAG_NAME, value="input")
+        username = user_inputs[0]
+        password = user_inputs[1]
+        submit_button = self.driver.find_element(by=By.ID, value="btnLogin")
+
+        username.send_keys(USERNAME)
+        password.send_keys(SK_PASSWORD)
         submit_button.click()
 
     @log_decorator

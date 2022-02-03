@@ -1,5 +1,5 @@
 import time
-from pprint import pprint
+# from pprint import pprint
 from data_manager import Data
 from time_manager import Dates
 from browser_manager import Browser
@@ -39,24 +39,66 @@ cz_compass.load_report_urls(cz_data.data_dict)
 
 # creates report objects, calling all needed methods, pass in current driver
 
-de_01 = De01(driver=cz_compass.driver, data=cz_data.data_dict[0], start_date=dates.dates_str["month_start"],
-             end_date=dates.dates_str["yesterday"], location=cz_data.location)
-de01_file = FileManager(src_file="DE01_Policies.xlsx", dest_file="DE01_Policies.xlsx")
+de_01_cz = De01(driver=cz_compass.driver, data=cz_data.data_dict[0], start_date=dates.dates_str["month_start"],
+                end_date=dates.dates_str["yesterday"], location=cz_data.location, division="4LifeDirectCzechRepublic")
+de01_file_cz = FileManager(src_file="DE01_Policies.xlsx", dest_file="DE01_Policies.xlsx")
 
-de_02 = De02(driver=cz_compass.driver, data=cz_data.data_dict[1], start_date=dates.dates_str["month_start"],
-             end_date=dates.dates_str["yesterday"], location=cz_data.location)
-de02_file = FileManager(src_file="DE02_Leads_Full.xlsx", dest_file="DE02_Leads.xlsx")
+de_02_cz = De02(driver=cz_compass.driver, data=cz_data.data_dict[1], start_date=dates.dates_str["month_start"],
+                end_date=dates.dates_str["yesterday"], location=cz_data.location)
+de02_file_cz = FileManager(src_file="DE02_Leads_Full.xlsx", dest_file="DE02_Leads.xlsx")
 
-s_26 = S26(driver=cz_compass.driver, data=cz_data.data_dict[2], start_date=dates.dates_str["month_start"],
-           location=cz_data.location)
-s26_file = FileManager(src_file="S26_TimeToCall.xlsx", dest_file="S26_TimeToCall_CZ.xlsx")
+s_26_cz = S26(driver=cz_compass.driver, data=cz_data.data_dict[2], start_date=dates.dates_str["month_start"],
+              location=cz_data.location)
+s26_file_cz = FileManager(src_file="S26_TimeToCall.xlsx", dest_file="S26_TimeToCall_CZ.xlsx")
 
-de_01_all = De01(driver=cz_compass.driver, data=cz_data.data_dict[3], start_date=dates.dates_str["year_start"],
-                 end_date=dates.dates_str["yesterday"], location=cz_data.location)
-de01_all_file = FileManager(src_file="DE01_Policies.xlsx", dest_file="DE01_Policies_all.xlsx")
+de_01_all_cz = De01(driver=cz_compass.driver, data=cz_data.data_dict[3], start_date=dates.dates_str["year_start"],
+                    end_date=dates.dates_str["yesterday"], location=cz_data.location,
+                    division="4LifeDirectCzechRepublic")
+de01_all_file_cz = FileManager(src_file="DE01_Policies.xlsx", dest_file="DE01_Policies_all.xlsx")
 
-cm_08 = Cm08(driver=cz_compass.driver, data=cz_data.data_dict[4], start_date=dates.dates_str["year_rider"],
-             end_date=dates.dates_str["yesterday_rider"], location=cz_data.location)
-cm08_file = FileManager(src_file="CM08_Rider_Upgrade.xlsx", dest_file="CM08_Rider_Upgrade_CZ.xlsx")
+cm_08_cz = Cm08(driver=cz_compass.driver, data=cz_data.data_dict[4], start_date=dates.dates_str["year_rider"],
+                end_date=dates.dates_str["yesterday_rider"], location=cz_data.location)
+cm08_file_cz = FileManager(src_file="CM08_Rider_Upgrade.xlsx", dest_file="CM08_Rider_Upgrade_CZ.xlsx")
 
 cz_compass.driver.quit()
+
+# open Chrome browser
+sk_compass = Browser()
+# load cz compass main page
+sk_compass.load_sk_compass(sk_data.location)
+# login into cz compass
+sk_compass.login_sk()
+# open blank tabs for reports
+sk_compass.open_tabs(len(sk_data.report_paths))
+# get list of blank tabs objects
+sk_compass.get_tab_objects()
+print(sk_compass.tabs)
+# pass tabs list from browser to data
+sk_data.tabs = sk_compass.tabs
+print(sk_data.tabs)
+# generates data structure to further work with Chrome driver
+sk_data.generate_full_data()
+# loads cz reports urls in blank tabs
+sk_compass.load_report_urls(sk_data.data_dict)
+
+de_01_sk = De01(driver=sk_compass.driver, data=sk_data.data_dict[0], start_date=dates.dates_str["month_start"],
+                end_date=dates.dates_str["yesterday"], location=sk_data.location, division="4LifeDirectSlovakia")
+de01_file_sk = FileManager(src_file="DE01_Policies.xlsx", dest_file="DE01_Policies_SK.xlsx")
+
+de_02_sk = De02(driver=sk_compass.driver, data=sk_data.data_dict[1], start_date=dates.dates_str["month_start"],
+                end_date=dates.dates_str["yesterday"], location=sk_data.location)
+de02_file_sk = FileManager(src_file="DE02_Leads_Full.xlsx", dest_file="DE02_Leads_SK.xlsx")
+
+s_26_sk = S26(driver=sk_compass.driver, data=sk_data.data_dict[2], start_date=dates.dates_str["month_start"],
+              location=sk_data.location)
+s26_file_sk = FileManager(src_file="S26_TimeToCall.xlsx", dest_file="S26_TimeToCall_SK.xlsx")
+
+de_01_all_sk = De01(driver=sk_compass.driver, data=sk_data.data_dict[3], start_date=dates.dates_str["year_start"],
+                    end_date=dates.dates_str["yesterday"], location=sk_data.location, division="4LifeDirectSlovakia")
+de01_all_file_sk = FileManager(src_file="DE01_Policies.xlsx", dest_file="DE01_Policies_all_SK.xlsx")
+
+cm_08_sk = Cm08(driver=sk_compass.driver, data=sk_data.data_dict[4], start_date=dates.dates_str["year_rider"],
+                end_date=dates.dates_str["yesterday_rider"], location=sk_data.location)
+cm08_file_sk = FileManager(src_file="CM08_Rider_Upgrade.xlsx", dest_file="CM08_Rider_Upgrade_SK.xlsx")
+
+sk_compass.driver.quit()

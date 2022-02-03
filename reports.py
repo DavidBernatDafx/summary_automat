@@ -5,13 +5,37 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver import ActionChains
 
 
-class De01:
+class Report:
 
-    def __init__(self, driver, data: dict, start_date: str, end_date: str, location: str):
+    def __init__(self):
+        pass
+
+    @log_decorator
+    def save_report(self):
+        save_button = self.driver.find_element(by=By.ID, value="ReportViewer1_ctl09_ctl04_ctl00_ButtonImgDown")
+        # trigger = self.driver.find_element(by=By.ID, value="ReportViewer1_ctl09_ctl00_TotalPages").text.strip(" ?")
+        save_button.click()
+        while True:
+            trigger = self.driver.find_element(by=By.ID, value="ReportViewer1_ctl09_ctl00_TotalPages").text.strip(" ?")
+            print(trigger)
+            if trigger != "0":
+                print("Report is generated.")
+                save_button.click()
+                ActionChains(self.driver).send_keys(Keys.ARROW_DOWN).send_keys(Keys.ENTER).perform()
+                print("Saving report.")
+                break
+            else:
+                time.sleep(5)
+
+
+class De01(Report):
+
+    def __init__(self, driver, data: dict, start_date: str, end_date: str, location: str, division: str):
+        super().__init__()
         self.start_date = start_date
         self.end_date = end_date
         self.filter_by = "CreateDt"
-        self.division = "4LifeDirectCzechRepublic"
+        self.division = division
         self.premium_no = "1"
         self.location = location
         self.driver = driver
@@ -45,27 +69,11 @@ class De01:
         self.elements["submit_button"].click()
         time.sleep(1)
 
-    @log_decorator
-    def save_report(self):
-        save_button = self.driver.find_element(by=By.ID, value="ReportViewer1_ctl09_ctl04_ctl00_ButtonImgDown")
-        # trigger = self.driver.find_element(by=By.ID, value="ReportViewer1_ctl09_ctl00_TotalPages").text.strip(" ?")
-        save_button.click()
-        while True:
-            trigger = self.driver.find_element(by=By.ID, value="ReportViewer1_ctl09_ctl00_TotalPages").text.strip(" ?")
-            print(trigger)
-            if trigger != "0":
-                print("Report is generated.")
-                save_button.click()
-                ActionChains(self.driver).send_keys(Keys.ARROW_DOWN).send_keys(Keys.ENTER).perform()
-                print("Saving report.")
-                break
-            else:
-                time.sleep(5)
 
-
-class De02:
+class De02(Report):
 
     def __init__(self, driver, data: dict, start_date: str, end_date: str, location: str):
+        super().__init__()
         self.start_date = start_date
         self.end_date = end_date
         self.lead_types = "SMS Lead,Web Lead,Info Line Lead,CRO Lead,Enquirer Lead,Referral Lead,Online Lead," \
@@ -106,27 +114,11 @@ class De02:
         self.elements["submit_button"].click()
         time.sleep(1)
 
-    @log_decorator
-    def save_report(self):
-        save_button = self.driver.find_element(by=By.ID, value="ReportViewer1_ctl09_ctl04_ctl00_ButtonImgDown")
-        # trigger = self.driver.find_element(by=By.ID, value="ReportViewer1_ctl09_ctl00_TotalPages").text.strip(" ?")
-        save_button.click()
-        while True:
-            trigger = self.driver.find_element(by=By.ID, value="ReportViewer1_ctl09_ctl00_TotalPages").text.strip(" ?")
-            print(trigger)
-            if trigger != "0":
-                print("Report is generated.")
-                save_button.click()
-                ActionChains(self.driver).send_keys(Keys.ARROW_DOWN).send_keys(Keys.ENTER).perform()
-                print("Saving report.")
-                break
-            else:
-                time.sleep(5)
 
-
-class S26:
+class S26(Report):
 
     def __init__(self, driver, data: dict, start_date: str, location: str):
+        super().__init__()
         self.driver = driver
         self.start_date = start_date
         self.location = location
@@ -162,27 +154,11 @@ class S26:
         self.elements["submit_button"].click()
         time.sleep(10)
 
-    @log_decorator
-    def save_report(self):
-        save_button = self.driver.find_element(by=By.ID, value="ReportViewer1_ctl09_ctl04_ctl00_ButtonImgDown")
-        # trigger = self.driver.find_element(by=By.ID, value="ReportViewer1_ctl09_ctl00_TotalPages").text.strip(" ?")
-        save_button.click()
-        while True:
-            trigger = self.driver.find_element(by=By.ID, value="ReportViewer1_ctl09_ctl00_TotalPages").text.strip(" ?")
-            print(trigger)
-            if trigger != "0":
-                print("Report is generated.")
-                save_button.click()
-                ActionChains(self.driver).send_keys(Keys.ARROW_DOWN).send_keys(Keys.ENTER).perform()
-                print("Saving report.")
-                break
-            else:
-                time.sleep(5)
 
-
-class Cm08:
+class Cm08(Report):
 
     def __init__(self, driver, data: dict, start_date: str, end_date: str, location: str):
+        super().__init__()
         self.start_date = start_date
         self.end_date = end_date
         self.location = location
@@ -208,20 +184,3 @@ class Cm08:
         self.elements["end_date_field"].send_keys(self.end_date)
         self.elements["submit_button"].click()
         time.sleep(1)
-
-    @log_decorator
-    def save_report(self):
-        save_button = self.driver.find_element(by=By.ID, value="ReportViewer1_ctl09_ctl04_ctl00_ButtonImgDown")
-        # trigger = self.driver.find_element(by=By.ID, value="ReportViewer1_ctl09_ctl00_TotalPages").text.strip(" ?")
-        save_button.click()
-        while True:
-            trigger = self.driver.find_element(by=By.ID, value="ReportViewer1_ctl09_ctl00_TotalPages").text.strip(" ?")
-            print(trigger)
-            if trigger != "0":
-                print("Report is generated.")
-                save_button.click()
-                ActionChains(self.driver).send_keys(Keys.ARROW_DOWN).send_keys(Keys.ENTER).perform()
-                print("Saving report.")
-                break
-            else:
-                time.sleep(5)
