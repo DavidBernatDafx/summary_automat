@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from decorators import log_decorator
 from pprint import pprint
 import pandas as pd
-from openpyxl.workbook import Workbook
+# from openpyxl.workbook import Workbook
 from time_manager import convert_duration
 
 load_dotenv("_env/.env")
@@ -64,13 +64,14 @@ class VccCdrData:
 
         self.vcc_data = vcc_data
         self.source_df = pd.DataFrame(self.vcc_data)
+        print(self.source_df.shape)
         self.col_dict = {}
         self.rename_columns(old=src_col_names, new=exp_col_names)
         self.converted_df = self.convert_data(time_cols=convert_time_cols,
                                               data_cols=convert_str_cols,
                                               phone_cols=convert_phone_cols,
                                               disp_cols=convert_disposition_cols)
-        print(self.converted_df, "test")
+
         self.export_df = self.create_export_dataframe()
         self.create_excel(filename=xlsx_filename)
 
@@ -129,3 +130,18 @@ class VccCdrData:
         # self.export_df.to_excel("data/vcc_data.xlsx", sheet_name=sheet_name, index=False,)
         # with pd.ExcelWriter("data/vcc_data.xlsx", engine="openpyxl") as writer:
         self.export_df.to_excel(path, index=False)
+
+
+class VccUserStateData:
+
+    def __init__(self, data: list, xlsx_filename: str):
+        self.vcc_data = data
+        self.source_df = pd.DataFrame(self.vcc_data)
+        pprint(self.source_df)
+        self.create_excel(filename=xlsx_filename)
+
+    def create_excel(self, filename: str):
+        path = f"data/{filename}"
+        # self.export_df.to_excel("data/vcc_data.xlsx", sheet_name=sheet_name, index=False,)
+        # with pd.ExcelWriter("data/vcc_data.xlsx", engine="openpyxl") as writer:
+        self.source_df.to_excel(path, index=False)

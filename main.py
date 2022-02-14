@@ -1,11 +1,11 @@
 import time
 from pprint import pprint
-from data_manager import CompassMetaData, VccCdrData
+from data_manager import CompassMetaData, VccCdrData, VccUserStateData
 from time_manager import Dates
 from browser_manager import Browser
 from reports import De01, De02, S26, Cm08
 from file_manager import FileManager
-from vcc import VccCdr
+from vcc import VccCdr, VccUserState
 import os
 
 # instantiate data objects - for now compass URLs
@@ -48,7 +48,7 @@ print("dates object created")
 #                 end_date=dates.dates_str["yesterday"], location=cz_data.location)
 # de02_file_cz = FileManager(src_file="DE02_Leads_Full.xlsx", dest_file="DE02_Leads.xlsx")
 #
-# s_26_cz = S26(driver=cz_compass.driver, data=cz_data.data_dict[2], start_date=dates.dates_str["month_start"],
+# s_26_cz = S26(driver=cz_compass.driver, data=cz_data.data_dict[2], start_date=dates.dates_str["year_start"],
 #               location=cz_data.location)
 # s26_file_cz = FileManager(src_file="S26_TimeToCall.xlsx", dest_file="S26_TimeToCall_CZ.xlsx")
 #
@@ -90,7 +90,7 @@ print("dates object created")
 #                 end_date=dates.dates_str["yesterday"], location=sk_data.location)
 # de02_file_sk = FileManager(src_file="DE02_Leads_Full.xlsx", dest_file="DE02_Leads_SK.xlsx")
 #
-# s_26_sk = S26(driver=sk_compass.driver, data=sk_data.data_dict[2], start_date=dates.dates_str["month_start"],
+# s_26_sk = S26(driver=sk_compass.driver, data=sk_data.data_dict[2], start_date=dates.dates_str["year_start"],
 #               location=sk_data.location)
 # s26_file_sk = FileManager(src_file="S26_TimeToCall.xlsx", dest_file="S26_TimeToCall_SK.xlsx")
 #
@@ -107,18 +107,18 @@ print("dates object created")
 
 """SECTION VCC"""
 
-cdr_41 = VccCdr(project_id=41, year=dates.dates_vcc_str["year"], month=dates.dates_vcc_str["month"])
-cdr_15 = VccCdr(project_id=15, year=dates.dates_vcc_str["year"], month=dates.dates_vcc_str["month"])
-cdr_32 = VccCdr(project_id=32, year=dates.dates_vcc_str["year"], month=dates.dates_vcc_str["month"])
-cdr_39 = VccCdr(project_id=39, year=dates.dates_vcc_str["year"], month=dates.dates_vcc_str["month"])
+# cdr_41 = VccCdr(project_id=41, year=dates.dates_vcc_str["year"], month=dates.dates_vcc_str["month"])
+# cdr_15 = VccCdr(project_id=15, year=dates.dates_vcc_str["year"], month=dates.dates_vcc_str["month"])
+# cdr_32 = VccCdr(project_id=32, year=dates.dates_vcc_str["year"], month=dates.dates_vcc_str["month"])
+# cdr_39 = VccCdr(project_id=39, year=dates.dates_vcc_str["year"], month=dates.dates_vcc_str["month"])
+#
+# data_41 = VccCdrData(cdr_41.cdr_data, xlsx_filename="cdr-41.xlsx")
+# data_15 = VccCdrData(cdr_15.cdr_data, xlsx_filename="cdr-15.xlsx")
+# data_32 = VccCdrData(cdr_32.cdr_data, xlsx_filename="cdr-32.xlsx")
+# data_39 = VccCdrData(cdr_39.cdr_data, xlsx_filename="cdr-39.xlsx")
 
-data_41 = VccCdrData(cdr_41.cdr_data, xlsx_filename="cdr-41.xlsx")
-data_15 = VccCdrData(cdr_15.cdr_data, xlsx_filename="cdr-15.xlsx")
-data_32 = VccCdrData(cdr_32.cdr_data, xlsx_filename="cdr-32.xlsx")
-data_39 = VccCdrData(cdr_39.cdr_data, xlsx_filename="cdr-39.xlsx")
-
-
-
+vcc_user_state = VccUserState(from_date=dates.dates_vcc_str["start"], to_date=dates.dates_vcc_str["end"])
+data_user_state = VccUserStateData(data=vcc_user_state.log_data, xlsx_filename="user-state.xlsx")
 
 
 
