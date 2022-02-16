@@ -55,4 +55,12 @@ class Dates:
 
 
 def convert_duration(duration: int):
-    return str(timedelta(seconds=duration))
+    return timedelta(seconds=duration)
+
+
+def convert_time(time: str):
+    dt_time = datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
+    return dt_time
+    # .strftime("%d.%m.%Y  %H:%M:%S")
+
+
