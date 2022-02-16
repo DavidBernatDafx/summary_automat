@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from pprint import pprint
 import math
 
-load_dotenv("env/.env")
+load_dotenv("_env/.env")
 API_KEY = os.getenv("vcc_api_key")
 ACCOUNT = os.getenv("vcc_account")
 
