@@ -7,7 +7,7 @@ from selenium.webdriver.chrome.service import Service
 from decorators import log_decorator
 from pprint import pprint
 
-load_dotenv("_env/.env")
+load_dotenv("env/.env")
 URL = os.getenv("url")
 USERNAME = os.getenv("username")
 CZ_PASSWORD = os.getenv("cz_pass")

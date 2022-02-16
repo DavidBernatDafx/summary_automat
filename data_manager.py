@@ -6,7 +6,7 @@ import pandas as pd
 # from openpyxl.workbook import Workbook
 from time_manager import convert_duration, convert_time
 
-load_dotenv("_env/.env")
+load_dotenv("env/.env")
 URL_BASE = os.getenv("url")
 
 report_url_appendices = ["ReportViewer.aspx?reportId=67&report=DE01_Policies",
