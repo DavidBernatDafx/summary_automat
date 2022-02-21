@@ -8,18 +8,22 @@ from selenium.webdriver import ActionChains
 class Report:
 
     def __init__(self):
+        self.no_report = False
         pass
 
     @log_decorator
     def save_report(self):
+        time.sleep(1)
         save_button = self.driver.find_element(by=By.ID, value="ReportViewer1_ctl09_ctl04_ctl00_ButtonImgDown")
         # trigger = self.driver.find_element(by=By.ID, value="ReportViewer1_ctl09_ctl00_TotalPages").text.strip(" ?")
         save_button.click()
+        print("Waiting for report table")
         while True:
             trigger = self.driver.find_element(by=By.ID, value="ReportViewer1_ctl09_ctl00_TotalPages").text.strip(" ?")
-            print(trigger)
+
             if trigger != "0":
                 print("Report is generated.")
+                save_button = self.driver.find_element(by=By.ID, value="ReportViewer1_ctl09_ctl04_ctl00_ButtonImgDown")
                 save_button.click()
                 ActionChains(self.driver).send_keys(Keys.ARROW_DOWN).send_keys(Keys.ENTER).perform()
                 print("Saving report.")

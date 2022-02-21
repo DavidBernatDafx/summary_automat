@@ -60,6 +60,7 @@ class VccUserState:
         self.log_count = None
         self.get_user_state_report()
 
+    @log_decorator
     def get_user_state_report(self):
         url = f"https://{ACCOUNT}:{API_KEY}@{ACCOUNT}.asp.virtual-call-center.eu/v2/statistics/userstate"
         options = {

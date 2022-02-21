@@ -1,13 +1,13 @@
 import os
 from dotenv import load_dotenv
 from decorators import log_decorator
+import datetime as dt
 from pprint import pprint
 import pandas as pd
-# from openpyxl.workbook import Workbook
 from time_manager import convert_duration, convert_time
 
 load_dotenv("_env/.env")
-URL_BASE = os.getenv("url")
+url_base = os.getenv("URL")
 
 report_url_appendices = ["ReportViewer.aspx?reportId=67&report=DE01_Policies",
                          "ReportViewer.aspx?reportId=169&report=DE02_Leads_Full",
@@ -28,7 +28,7 @@ class CompassMetaData:
 
     @log_decorator
     def generate_report_paths(self):
-        self.report_paths = [f"{URL_BASE}{self.location}/{rep}" for rep in report_url_appendices]
+        self.report_paths = [f"{url_base}{self.location}/{rep}" for rep in report_url_appendices]
         pprint(self.report_paths)
 
     @log_decorator
@@ -70,7 +70,7 @@ class VccCdrData:
                                               data_cols=convert_str_cols,
                                               phone_cols=convert_phone_cols,
                                               disp_cols=convert_disposition_cols)
-
+        print(self.converted_df["Talk Time"])
         self.export_df = self.create_export_dataframe()
         self.create_excel(filename=xlsx_filename)
 
@@ -79,6 +79,7 @@ class VccCdrData:
         col_dict = {old[i]: new[i] for i in range(len(old)) if len(old) == len(new)}
         self.source_df.rename(columns=col_dict, inplace=True)
 
+    @log_decorator
     def convert_data(self, time_cols: list, data_cols: list, phone_cols: list, disp_cols: list):
         df_dict = self.source_df.to_dict()
 
@@ -104,7 +105,7 @@ class VccCdrData:
 
         return pd.DataFrame.from_dict(df_dict)
 
-    # @log_decorator
+    @log_decorator
     def create_export_dataframe(self):
         export_df = self.converted_df[["UUID", "Short Call ID", "Project ID", "Source", "Destination", "Direction",
                                        "Agent", "Record ID", "Queue", "Start/Answer Time", "Billing Start Time",
@@ -123,7 +124,7 @@ class VccCdrData:
         export_df.insert(loc=35, column="Date Archived", value=None)
 
         return export_df
-
+    @log_decorator
     def create_excel(self, filename: str):
         path = f"data/{filename}"
         # self.export_df.to_excel("data/vcc_data.xlsx", sheet_name=sheet_name, index=False,)
@@ -154,12 +155,14 @@ class VccUserStateData:
         self.export_df = self.create_export_dataframe()
         self.create_excel(filename=xlsx_filename)
 
+    @log_decorator
     def rename_columns(self, old: list, new: list):
         col_dict = {old[i]: new[i] for i in range (len(old)) if len(old) == len(new)}
         self.source_df.rename(columns=col_dict, inplace=True)
         self.source_df["Project"] = None
         self.source_df["Secondary Project"] = None
 
+    @log_decorator
     def convert_data(self, projects: dict):
         df_dict = self.source_df.to_dict()
 
@@ -190,11 +193,13 @@ class VccUserStateData:
 
         return pd.DataFrame.from_dict(df_dict)
 
+    @log_decorator
     def create_export_dataframe(self):
         export_df = self.converted_df[["Username", "Time", "Status", "Time Spent in State", "Project", "Project ID",
                                        "Secondary Project", "Secondary Project ID", "Record ID"]]
         return export_df
 
+    @log_decorator
     def create_excel(self, filename: str):
         path = f"data/{filename}"
         # self.export_df.to_excel("data/vcc_data.xlsx", sheet_name=sheet_name, index=False,)

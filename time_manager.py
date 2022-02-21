@@ -27,7 +27,6 @@ class Dates:
             "day": str(month_start.day),
             "day_to": str(yesterday.day),
         }
-        print(self.dates_vcc)
         self.dates_str = {}
         self.convert()
         self.dates_vcc_str = {}
@@ -55,7 +54,8 @@ class Dates:
 
 
 def convert_duration(duration: int):
-    return timedelta(seconds=duration)
+    td = timedelta(seconds=int(duration))
+    return td
 
 
 def convert_time(time: str):

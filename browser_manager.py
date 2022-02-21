@@ -8,55 +8,55 @@ from decorators import log_decorator
 from pprint import pprint
 
 load_dotenv("_env/.env")
-URL = os.getenv("url")
-USERNAME = os.getenv("username")
-CZ_PASSWORD = os.getenv("cz_pass")
-SK_PASSWORD = os.getenv("sk_pass")
-DRIVER_PATH = os.getenv("driver_path")
+url = os.getenv("URL")
+username = os.getenv("USERNAME")
+cz_password = os.getenv("CZ_PASS")
+sk_password = os.getenv("SK_PASS")
+driver_path = os.getenv("DRIVER_PATH")
 
 
 class Browser:
 
     def __init__(self):
-        self.service = Service(executable_path=DRIVER_PATH)
+        self.service = Service(executable_path=driver_path)
         self.options = webdriver.ChromeOptions()
-        self.prefs = {"download.default_directory": "D:\\4life\data\\"}
+        self.prefs = {"download.default_directory": "D:\\summary_automat\data\\"}
         self.options.add_experimental_option("prefs", self.prefs)
         self.driver = webdriver.Chrome(service=self.service, options=self.options)
         self.tabs = []
 
     @log_decorator
     def load_cz_compass(self, loc: str):
-        url = f"{URL}{loc}"
-        self.driver.get(url=url)
+        cz_url = f"{url}{loc}"
+        self.driver.get(url=cz_url)
 
     @log_decorator
     def load_sk_compass(self, loc: str):
-        url = f"{URL}{loc}"
-        self.driver.get(url=url)
+        sk_url = f"{url}{loc}"
+        self.driver.get(url=sk_url)
 
     @log_decorator
     def login_cz(self):
         time.sleep(1)
         user_inputs = self.driver.find_elements(by=By.TAG_NAME, value="input")
-        username = user_inputs[0]
+        compass_username = user_inputs[0]
         password = user_inputs[1]
         submit_button = self.driver.find_element(by=By.ID, value="btnLogin")
 
-        username.send_keys(USERNAME)
-        password.send_keys(SK_PASSWORD)
+        compass_username.send_keys(username)
+        password.send_keys(sk_password)
         submit_button.click()
 
     @log_decorator
     def login_sk(self):
         time.sleep(1)
         user_inputs = self.driver.find_elements(by=By.TAG_NAME, value="input")
-        username = user_inputs[0]
+        compass_username = user_inputs[0]
         password = user_inputs[1]
         submit_button = self.driver.find_element(by=By.ID, value="btnLogin")
 
-        username.send_keys(USERNAME)
-        password.send_keys(SK_PASSWORD)
+        compass_username.send_keys(username)
+        password.send_keys(sk_password)
         submit_button.click()
 
     @log_decorator
