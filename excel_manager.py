@@ -61,7 +61,7 @@ def excel_manipulation():
     user_log[1].close()
     print(user_log)
 
-    vcc = create_worksheets(path=vcc_path, sheets_names=["List1", "List2"])
+    vcc = create_worksheets(path=vcc_path, sheets_names=["infoline_zdroj", "List2"])
     print(vcc)
 
     delete_content(vcc)

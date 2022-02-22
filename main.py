@@ -9,6 +9,7 @@ from vcc import VccCdr, VccUserState
 from excel_manager import excel_manipulation, run_excel_macros
 import os
 
+
 # instantiate data objects - for now compass URLs
 cz_data = CompassMetaData("cz")
 print("cz_data object created")

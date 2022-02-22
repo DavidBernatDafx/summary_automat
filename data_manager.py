@@ -58,6 +58,7 @@ class VccCdrData:
                          "Afterwork Time", "Hold Status", "Handling Time"]
         convert_time_cols = ["Ring Time", "Billable Time", "Talk Time", "Queue Time", "Time Before Queue",
                              "Hold Status", "Afterwork Time", "Prework Time"]
+        convert_phone_cols = ["Source", "Destination"]
         convert_str_cols = ["Hung Up By"]
         convert_phone_cols = ["Source", "Destination"]
         convert_disposition_cols = ["disposition_label", "Disposition"]
@@ -98,6 +99,10 @@ class VccCdrData:
             for k, v in df_dict[col].items():
                 if v == "0000000000":
                     df_dict[col][k] = "0"
+
+        for col in phone_cols:
+            for k, v in df_dict[col].items():
+                df_dict[col][k] = int(v)
 
         for k, v in df_dict[disp_cols[1]].items():
             if not v:
