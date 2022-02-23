@@ -1,4 +1,6 @@
 import os
+
+import pandas
 from dotenv import load_dotenv
 from decorators import log_decorator
 import datetime as dt
@@ -6,9 +8,11 @@ from pprint import pprint
 import pandas as pd
 from time_manager import convert_duration, convert_time
 
+# loading environment variables
 load_dotenv("_env/.env")
 url_base = os.getenv("URL")
 
+# list of url segments after /
 report_url_appendices = ["ReportViewer.aspx?reportId=67&report=DE01_Policies",
                          "ReportViewer.aspx?reportId=169&report=DE02_Leads_Full",
                          "ReportViewer.aspx?reportId=161&report=S26_TimeToCall",
@@ -18,8 +22,26 @@ report_url_appendices = ["ReportViewer.aspx?reportId=67&report=DE01_Policies",
 
 
 class CompassMetaData:
+    """
+    Class that represents various metadata to operate Chrome via selenium driver
+
+    Attributes
+    ----------
+    None
+
+    Methods
+    -------
+    generate_report_paths()
+        generates compass report full urls, that are populated in self.report_paths
+    generate_full_data()
+        generate full metadata dict, adding browser tabs object
+
+    """
 
     def __init__(self, location: str):
+        """
+        :param str location: string "cz" or "sk" corresponding to cz or sk compass
+        """
         self.location = location
         self.report_paths = []
         self.generate_report_paths()
@@ -27,12 +49,21 @@ class CompassMetaData:
         self.data_dict = {}
 
     @log_decorator
-    def generate_report_paths(self):
+    def generate_report_paths(self) -> list:
+        """
+        Method that populates self.report_paths with full urls
+
+        :return: list self.report_paths
+        """
         self.report_paths = [f"{url_base}{self.location}/{rep}" for rep in report_url_appendices]
-        pprint(self.report_paths)
 
     @log_decorator
-    def generate_full_data(self):
+    def generate_full_data(self) -> dict:
+        """
+        Method that populates self.data_dict with url paths, and Chrome tab objects
+
+        :return: dict self.data_dict
+        """
         if len(self.report_paths) == len(self.tabs):
             self.data_dict = {i: {"path": self.report_paths[i], "tab": self.tabs[i]}
                               for i in range(len(self.report_paths))
@@ -41,52 +72,90 @@ class CompassMetaData:
 
 
 class VccCdrData:
+    """
+    Class that represents and process requested CDR data from VCC API
+
+    Attributes
+    ----------
+    None
+
+    Methods
+    -------
+    rename_columns(old: list, new: list)
+        rename pandas Dataframe Column names
+    convert_data(time_cols: list, data_cols: list, phone_cols: list, disp_cols: list)
+        converts data in various Dataframe columns to match CDR logs from VCC standalone app
+    create_export_dataframe()
+        creates pandas Dataframe, that matches Excel CDR log structure
+    create_excel(filename: str)
+        saves export dataframe as temporary Excel file
+    """
 
     def __init__(self, vcc_data: list, xlsx_filename: str):
-
+        """
+        :param list vcc_data: Get CDR log response json
+        :param str xlsx_filename: string repr. of temporary Excel filename
+        """
+        # source json column names
         src_col_names = ["uuid", "shortid", "projectid", "source", "destination", "direction", "userfullname",
                          "numberid", "queue_label", "start_ts", "billing_ts", "next_contact", "prework",
                          "ringtime", "billingtime", "talktime", "queuetime", "beforequeuetime",
                          "disposition_export_name", "dispositionreach_label", "dispositionstatus_label",
                          "disposition_comment", "dialermode_label", "dc", "vcc_score", "hangup_disposition",
                          "afterwork", "holdtime", "sum_work"]
+        # destination excel column names
         exp_col_names = ["UUID", "Short Call ID", "Project ID", "Source", "Destination", "Direction", "Agent",
                          "Record ID", "Queue", "Start/Answer Time", "Billing Start Time", "Callback Date",
                          "Prework Time", "Ring Time", "Billable Time", "Talk Time", "Queue Time",
                          "Time Before Queue", "Disposition", "Disposition Outcome", "Disposition Type",
                          "Disposition note", "Dialing Mode", "Disconnect Cause Code", "Scores", "Hung Up By",
                          "Afterwork Time", "Hold Status", "Handling Time"]
+        # lists for data conversions
         convert_time_cols = ["Ring Time", "Billable Time", "Talk Time", "Queue Time", "Time Before Queue",
                              "Hold Status", "Afterwork Time", "Prework Time"]
-        convert_phone_cols = ["Source", "Destination"]
         convert_str_cols = ["Hung Up By"]
         convert_phone_cols = ["Source", "Destination"]
         convert_disposition_cols = ["disposition_label", "Disposition"]
 
         self.vcc_data = vcc_data
         self.source_df = pd.DataFrame(self.vcc_data)
-        print(self.source_df.shape)
+        print(f" Data dimensions: {self.source_df.shape}")
         self.rename_columns(old=src_col_names, new=exp_col_names)
         self.converted_df = self.convert_data(time_cols=convert_time_cols,
                                               data_cols=convert_str_cols,
                                               phone_cols=convert_phone_cols,
                                               disp_cols=convert_disposition_cols)
-        print(self.converted_df["Talk Time"])
         self.export_df = self.create_export_dataframe()
         self.create_excel(filename=xlsx_filename)
 
     @log_decorator
-    def rename_columns(self, old: list, new: list):
+    def rename_columns(self, old: list, new: list) -> pandas.DataFrame:
+        """
+        Method that renames column names
+
+        :param list old: list with old json column names
+        :param list new: list with output column names
+        :return: pandas.Dataframe with renamed column names
+        """
         col_dict = {old[i]: new[i] for i in range(len(old)) if len(old) == len(new)}
         self.source_df.rename(columns=col_dict, inplace=True)
 
     @log_decorator
-    def convert_data(self, time_cols: list, data_cols: list, phone_cols: list, disp_cols: list):
+    def convert_data(self, time_cols: list, data_cols: list, phone_cols: list, disp_cols: list) -> pandas.DataFrame:
+        """
+        Method that converts various Dataframe columns data
+
+        :param list time_cols: list of columns for str -> timedelta conversion
+        :param list data_cols: list of columns for string conversions
+        :param list phone_cols: list of columns for str -> int conversion
+        :param list disp_cols: list of columns for str conditional conversion
+        :return: converted pandas.Dataframe
+        """
         df_dict = self.source_df.to_dict()
 
         for col in time_cols:
             for k, v in df_dict[col].items():
-                df_dict[col][k] = convert_duration(v)
+                df_dict[col][k] = pd.to_timedelta(v, unit="S")
 
         for col in data_cols:
             for k, v in df_dict[col].items():
@@ -111,7 +180,12 @@ class VccCdrData:
         return pd.DataFrame.from_dict(df_dict)
 
     @log_decorator
-    def create_export_dataframe(self):
+    def create_export_dataframe(self) -> pandas.DataFrame:
+        """
+        Method that creates export Dataframe with structure matching Excel file
+
+        :return: pandas.Dataframe
+        """
         export_df = self.converted_df[["UUID", "Short Call ID", "Project ID", "Source", "Destination", "Direction",
                                        "Agent", "Record ID", "Queue", "Start/Answer Time", "Billing Start Time",
                                        "Callback Date", "Prework Time", "Ring Time", "Billable Time", "Talk Time",
@@ -129,8 +203,15 @@ class VccCdrData:
         export_df.insert(loc=35, column="Date Archived", value=None)
 
         return export_df
+
     @log_decorator
     def create_excel(self, filename: str):
+        """
+        Method that creates temporary Excel file from export dataframe
+
+        :param filename: str representation of Excel filename
+        :return: Excel file
+        """
         path = f"data/{filename}"
         # self.export_df.to_excel("data/vcc_data.xlsx", sheet_name=sheet_name, index=False,)
         # with pd.ExcelWriter("data/vcc_data.xlsx", engine="openpyxl") as writer:
@@ -138,8 +219,30 @@ class VccCdrData:
 
 
 class VccUserStateData:
+    """
+    Class that represents and process requested user state log data from VCC API
+
+    Attributes
+    ----------
+    None
+
+    Methods
+    -------
+    rename_columns(old: list, new: list)
+        rename pandas Dataframe Column names
+    convert_data(projects: dict)
+        converts data in various Dataframe columns to match user state logs from VCC standalone app
+    create_export_dataframe()
+        creates pandas Dataframe, that matches Excel user state log structure
+    create_excel(filename: str)
+        saves export dataframe as temporary Excel file
+    """
 
     def __init__(self, data: list, xlsx_filename: str):
+        """
+        :param list vcc_data: Get user state log response json
+        :param str xlsx_filename: string repr. of temporary Excel filename
+        """
 
         src_col_names = ["name", "prevtime", "prevstate", "duration", "projectid", "secondary_projects", "numberid"]
         exp_col_names = ["Username", "Time", "Status", "Time Spent in State", "Project ID", "Secondary Project ID",
@@ -161,18 +264,32 @@ class VccUserStateData:
         self.create_excel(filename=xlsx_filename)
 
     @log_decorator
-    def rename_columns(self, old: list, new: list):
-        col_dict = {old[i]: new[i] for i in range (len(old)) if len(old) == len(new)}
+    def rename_columns(self, old: list, new: list) -> pandas.DataFrame:
+        """
+        Method that renames column names
+
+        :param list old: list with old json column names
+        :param list new: list with output column names
+        :return: pandas.Dataframe with renamed column names
+        """
+        col_dict = {old[i]: new[i] for i in range(len(old)) if len(old) == len(new)}
         self.source_df.rename(columns=col_dict, inplace=True)
         self.source_df["Project"] = None
         self.source_df["Secondary Project"] = None
 
     @log_decorator
-    def convert_data(self, projects: dict):
+    def convert_data(self, projects: dict) -> pandas.DataFrame:
+        """
+        Method that converts various column data
+
+        :param dict projects: dictionary of project id keys and project name values
+        :return: pandas.Dataframe
+        """
         df_dict = self.source_df.to_dict()
 
         for k, v in df_dict["Time Spent in State"].items():
-            df_dict["Time Spent in State"][k] = convert_duration(int(v))
+            # df_dict["Time Spent in State"][k] = convert_duration(int(v))
+            df_dict["Time Spent in State"][k] = pd.to_timedelta(v, unit="S")
 
         for k, v in df_dict["Time"].items():
             df_dict["Time"][k] = convert_time(v)
@@ -199,17 +316,25 @@ class VccUserStateData:
         return pd.DataFrame.from_dict(df_dict)
 
     @log_decorator
-    def create_export_dataframe(self):
+    def create_export_dataframe(self) -> pandas.DataFrame:
+        """
+        Method that creates export Dataframe with structure matching Excel file
+
+        :return: pandas.Dataframe
+        """
         export_df = self.converted_df[["Username", "Time", "Status", "Time Spent in State", "Project", "Project ID",
                                        "Secondary Project", "Secondary Project ID", "Record ID"]]
         return export_df
 
     @log_decorator
     def create_excel(self, filename: str):
+        """
+       Method that creates temporary Excel file from export dataframe
+
+       :param filename: str representation of Excel filename
+       :return: Excel file
+       """
         path = f"data/{filename}"
         # self.export_df.to_excel("data/vcc_data.xlsx", sheet_name=sheet_name, index=False,)
         # with pd.ExcelWriter("data/vcc_data.xlsx", engine="openpyxl") as writer:
         self.export_df.to_excel(path, index=False)
-
-
-

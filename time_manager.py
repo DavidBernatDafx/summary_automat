@@ -19,18 +19,30 @@ class Dates:
             "month_start": month_start,
             "year_start": year_start,
             "year_rider": year_rider,
-
         }
+
         self.dates_vcc = {
             "year": str(yesterday.year),
             "month": str(yesterday.month),
             "day": str(month_start.day),
-            "day_to": str(yesterday.day),
+            "day_to": str(now.day),
         }
+        self.get_last_bd()
         self.dates_str = {}
         self.convert()
         self.dates_vcc_str = {}
         self.convert_vcc()
+
+    @log_decorator
+    def get_last_bd(self):
+        day_name = self.dates["yesterday"].strftime("%A")
+        print(day_name)
+        if day_name == "Sunday":
+            self.dates["last_business_day"] = self.dates["yesterday"] - timedelta(days=2)
+        elif day_name == "Saturday":
+            self.dates["last_business_day"] = self.dates["yesterday"] - timedelta(days=1)
+        else:
+            self.dates["last_business_day"] = self.dates["yesterday"]
 
     @log_decorator
     def convert(self,):
@@ -54,13 +66,10 @@ class Dates:
 
 
 def convert_duration(duration: int):
-    td = timedelta(seconds=int(duration))
+    td = timedelta(seconds=duration)
     return td
 
 
 def convert_time(time: str):
     dt_time = datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
     return dt_time
-    # .strftime("%d.%m.%Y  %H:%M:%S")
-
-

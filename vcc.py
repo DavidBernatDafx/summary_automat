@@ -1,3 +1,5 @@
+import time
+
 import requests
 from decorators import log_decorator
 import os
@@ -60,7 +62,6 @@ class VccUserState:
         self.log_count = None
         self.get_user_state_report()
 
-    @log_decorator
     def get_user_state_report(self):
         url = f"https://{ACCOUNT}:{API_KEY}@{ACCOUNT}.asp.virtual-call-center.eu/v2/statistics/userstate"
         options = {
@@ -73,4 +74,23 @@ class VccUserState:
             data = response.json()
         self.log_data = data["response"]
 
+        for i in range(2):
+
+            next_options = {
+                "from": self.from_date,
+                "to": self.to_date,
+                "direction": "ASC",
+                "start": (i+1) * 100000,
+            }
+
+            try:
+                with requests.get(url, next_options) as response:
+                    response.raise_for_status()
+                    next_data = response.json()
+            except requests.exceptions.HTTPError:
+                print(f"No records above {next_options['start']}")
+            else:
+                next_log_data = next_data["response"]
+                for record in next_log_data:
+                    self.log_data.append(record)
 
