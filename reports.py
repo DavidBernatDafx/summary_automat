@@ -6,51 +6,101 @@ from selenium.webdriver import ActionChains
 
 
 class Report:
+    """
+    Class that represents chromedriver tab compass report object
+
+    Attributes
+    ----------
+    None
+
+    Methods
+    -------
+    save_report()
+        method that checks in time controlled loop if report table is generated.
+        When true it click download as xls html element.
+    """
 
     def __init__(self):
-        self.no_report = False
+        # self.no_report = False
         pass
 
     @log_decorator
-    def save_report(self):
+    def save_report(self) -> None:
+        """
+        Method that checks in time controlled loop if report table is generated.
+        When true it click download as xls html element.
+
+        return: None
+        """
         time.sleep(1)
         save_button = self.driver.find_element(by=By.ID, value="ReportViewer1_ctl09_ctl04_ctl00_ButtonImgDown")
-        # trigger = self.driver.find_element(by=By.ID, value="ReportViewer1_ctl09_ctl00_TotalPages").text.strip(" ?")
         save_button.click()
-        print("Waiting for report table")
+
         while True:
             trigger = self.driver.find_element(by=By.ID, value="ReportViewer1_ctl09_ctl00_TotalPages").text.strip(" ?")
 
             if trigger != "0":
-                print("Report is generated.")
                 save_button = self.driver.find_element(by=By.ID, value="ReportViewer1_ctl09_ctl04_ctl00_ButtonImgDown")
                 save_button.click()
                 ActionChains(self.driver).send_keys(Keys.ARROW_DOWN).send_keys(Keys.ENTER).perform()
-                print("Saving report.")
                 break
             else:
                 time.sleep(5)
 
 
 class De01(Report):
+    """
+    Subclass of Report class, that represents DE01 compass report
 
-    def __init__(self, driver, data: dict, start_date: str, end_date: str, location: str, division: str):
+    Attributes
+    ----------
+    driver : object
+        chrome webdriver object
+    data : dict
+        metadata passed from CompassMetaData.data_dict, contains tab object and url details
+    start_date : str
+        start date string to fill report form
+    end_date : str
+        end date string to fill report form
+    division : str
+        national division to fill report form
+    elements : dict
+        dictionary containing all needed html elements to interact with compass report webpage
+
+    Methods
+    -------
+    find_form_elements()
+        Method that finds all needed html elements to interact with compass report webpage
+    fill_form()
+        Method that fills form elements with class attributes
+    """
+
+    def __init__(self, driver, data: dict, start_date: str, end_date: str, division: str, loc: str):
         super().__init__()
         self.start_date = start_date
         self.end_date = end_date
         self.filter_by = "CreateDt"
         self.division = division
         self.premium_no = "1"
-        self.location = location
         self.driver = driver
+        self.loc = loc
         self.driver.switch_to.window(data["tab"])
         self.elements = {}
         self.find_form_elements()
         self.fill_form()
         self.save_report()
 
+    def __repr__(self):
+        return f"<DE01.{self.loc} Chrome tab>"
+
     @log_decorator
-    def find_form_elements(self):
+    def find_form_elements(self) -> None:
+        """
+        Method that finds all needed html elements to interact with compass report webpage
+
+        return: None
+        """
+        time.sleep(2)
         self.elements = {
             "start_date_field": self.driver.find_element(by=By.ID, value="ReportViewer1_ctl08_ctl03_txtValue"),
             "end_date_field": self.driver.find_element(by=By.ID, value="ReportViewer1_ctl08_ctl05_txtValue"),
@@ -62,7 +112,12 @@ class De01(Report):
         }
 
     @log_decorator
-    def fill_form(self):
+    def fill_form(self) -> None:
+        """
+        Method that fills form elements with class attributes
+
+        return: None
+        """
         self.elements["start_date_field"].send_keys(self.start_date)
         self.elements["end_date_field"].send_keys(self.end_date)
         self.elements["filter_by_field"].send_keys(self.filter_by)
@@ -75,8 +130,31 @@ class De01(Report):
 
 
 class De02(Report):
+    """
+    Subclass of Report class, that represents DE02 compass report
 
-    def __init__(self, driver, data: dict, start_date: str, end_date: str, location: str):
+    Attributes
+    ----------
+    driver : object
+        chrome webdriver object
+    data : dict
+        metadata passed from CompassMetaData.data_dict, contains tab object and url details
+    start_date : str
+        start date string to fill report form
+    end_date : str
+        end date string to fill report form
+    elements : dict
+        dictionary containing all needed html elements to interact with compass report webpage
+
+    Methods
+    -------
+    find_form_elements()
+        Method that finds all needed html elements to interact with compass report webpage
+    fill_form()
+        Method that fills form elements with class attributes
+    """
+
+    def __init__(self, driver, data: dict, start_date: str, end_date: str, loc: str):
         super().__init__()
         self.start_date = start_date
         self.end_date = end_date
@@ -84,16 +162,25 @@ class De02(Report):
                           "Imported Lead,Duplicate Lead,Bulk Mailer Lead,Referral Plus Lead,First Year Lead," \
                           "Paid Only Lead,Free Only Lead,Point Of Sale,CS Lead,Affiliate Lead,Web External Lead"
         self.include_duplicates = "Yes"
-        self.location = location
         self.driver = driver
+        self.loc = loc
         self.driver.switch_to.window(data["tab"])
         self.elements = {}
         self.find_form_elements()
         self.fill_form()
         self.save_report()
 
+    def __repr__(self):
+        return f"<DE02.{self.loc} Chrome tab>"
+
     @log_decorator
-    def find_form_elements(self):
+    def find_form_elements(self) -> None:
+        """
+        Method that finds all needed html elements to interact with compass report webpage
+
+        return: None
+        """
+        time.sleep(2)
         self.elements = {
             "start_date_field": self.driver.find_element(by=By.ID, value="ReportViewer1_ctl08_ctl03_txtValue"),
             "end_date_field": self.driver.find_element(by=By.ID, value="ReportViewer1_ctl08_ctl05_txtValue"),
@@ -104,7 +191,12 @@ class De02(Report):
         }
 
     @log_decorator
-    def fill_form(self):
+    def fill_form(self) -> None:
+        """
+        Method that fills form elements with class attributes
+
+        return: None
+        """
         self.elements["start_date_field"].send_keys(self.start_date)
         self.elements["end_date_field"].send_keys(self.end_date)
         self.elements["lead_types_dropdown"].click()
@@ -120,25 +212,60 @@ class De02(Report):
 
 
 class S26(Report):
+    """
+    Subclass of Report class, that represents S26 compass report
 
-    def __init__(self, driver, data: dict, start_date: str, location: str):
+    Attributes
+    ----------
+    driver : object
+        chrome webdriver object
+    data : dict
+        metadata passed from CompassMetaData.data_dict, contains tab object and url details
+    start_date : str
+        start date string to fill report form
+    elements : dict
+        dictionary containing all needed html elements to interact with compass report webpage
+
+    Methods
+    -------
+    find_form_elements()
+        Method that finds all needed html elements to interact with compass report webpage
+    fill_form()
+        Method that fills form elements with class attributes
+    """
+
+    def __init__(self, driver, data: dict, start_date: str, loc: str):
         super().__init__()
         self.driver = driver
+        self.loc = loc
         self.start_date = start_date
-        self.location = location
         self.driver.switch_to.window(data["tab"])
         self.elements = {}
         self.find_form_elements()
         self.fill_form()
         self.save_report()
 
+    def __repr__(self):
+        return f"<S26.{self.loc} Chrome tab>"
+
     @log_decorator
-    def find_form_elements(self):
+    def find_form_elements(self) -> None:
+        """
+        Method that finds all needed html elements to interact with compass report webpage
+
+        return: None
+        """
+        time.sleep(2)
         self.elements = {
             "current_time_field": self.driver.find_element(by=By.ID, value="ReportViewer1_ctl08_ctl03_ddValue")}
 
     @log_decorator
-    def fill_form(self):
+    def fill_form(self) -> None:
+        """
+        Method that fills form elements with class attributes
+
+        return: None
+        """
         self.elements["current_time_field"].click()
         time.sleep(1)
         ActionChains(self.driver).send_keys(Keys.ARROW_DOWN).send_keys(Keys.ENTER).perform()
@@ -160,21 +287,53 @@ class S26(Report):
 
 
 class Cm08(Report):
+    """
+    Subclass of Report class, that represents CM08 compass report
 
-    def __init__(self, driver, data: dict, start_date: str, end_date: str, location: str):
+    Attributes
+    ----------
+    driver : object
+        chrome webdriver object
+    data : dict
+        metadata passed from CompassMetaData.data_dict, contains tab object and url details
+    start_date : str
+        start date string to fill report form
+    end_date : str
+        end date string to fill report form
+    elements : dict
+        dictionary containing all needed html elements to interact with compass report webpage
+
+    Methods
+    -------
+    find_form_elements()
+        Method that finds all needed html elements to interact with compass report webpage
+    fill_form()
+        Method that fills form elements with class attributes
+    """
+
+    def __init__(self, driver, data: dict, start_date: str, end_date: str, loc: str):
         super().__init__()
         self.start_date = start_date
         self.end_date = end_date
-        self.location = location
         self.driver = driver
+        self.loc = loc
         self.driver.switch_to.window(data["tab"])
         self.elements = {}
         self.find_form_elements()
         self.fill_form()
         self.save_report()
 
+    def __repr__(self):
+        return f"<CM08.{self.loc} Chrome tab>"
+
     @log_decorator
-    def find_form_elements(self):
+    def find_form_elements(self) -> None:
+        """
+        Method that finds all needed html elements to interact with compass report webpage
+
+        return: None
+        """
+        time.sleep(2)
         self.elements = {
             "start_date_field": self.driver.find_element(by=By.ID, value="ReportViewer1_ctl08_ctl03_txtValue"),
             "end_date_field": self.driver.find_element(by=By.ID, value="ReportViewer1_ctl08_ctl05_txtValue"),
@@ -182,7 +341,12 @@ class Cm08(Report):
         }
 
     @log_decorator
-    def fill_form(self):
+    def fill_form(self) -> None:
+        """
+        Method that fills form elements with class attributes
+
+        return: None
+        """
         ActionChains(self.driver).double_click(self.elements["start_date_field"]).send_keys(Keys.DELETE).perform()
         self.elements["start_date_field"].send_keys(self.start_date)
         self.elements["end_date_field"].send_keys(self.end_date)

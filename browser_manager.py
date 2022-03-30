@@ -50,19 +50,29 @@ class Browser:
         """
         self.service = Service(executable_path=driver_path)
         self.options = webdriver.ChromeOptions()
-        self.prefs = {"download.default_directory": "D:\\summary_automat\data\\"}
+        full_path = os.path.join(os.getcwd(), "data")
+        # self.prefs = {"download.default_directory": "D:\\summary_automat\data\\"}
+        self.prefs = {"download.default_directory": full_path}
         # needs to be changed to actual project folder/data
         self.options.add_experimental_option("prefs", self.prefs)
         self.driver = webdriver.Chrome(service=self.service, options=self.options)
         self.tabs = []
+        self.loc = None
+
+    def __repr__(self):
+        if self.loc:
+            return f"<Chrome driver object {self.loc}>"
+        else:
+            return f"<Chrome driver object>"
 
     @log_decorator
     def load_cz_compass(self, loc: str) -> webdriver.Chrome:
         """ Method that loads cz compass webpage with selenium driver in Chrome window
 
-        :param str loc: string representing end of the url after last dot e.g. "cz"
-        :return webdriver.Chrome
+        param str loc: string representing end of the url after last dot e.g. "cz"
+        return webdriver.Chrome
         """
+        self.loc = loc
         cz_url = f"{url}{loc}"
         self.driver.get(url=cz_url)
 
@@ -70,8 +80,8 @@ class Browser:
     def load_sk_compass(self, loc: str) -> webdriver.Chrome:
         """ Method that loads cz compass webpage with selenium driver in Chrome window
 
-        :param str loc: string representing end of the url after last dot e.g. "sk"
-        :return webdriver.Chrome
+        param str loc: string representing end of the url after last dot e.g. "sk"
+        return webdriver.Chrome
         """
         sk_url = f"{url}{loc}"
         self.driver.get(url=sk_url)
@@ -82,7 +92,7 @@ class Browser:
         Method that log in user to cz compass
         log in detail are passed automatically from .env file
 
-        :return None
+        return None
         """
         time.sleep(1)
         user_inputs = self.driver.find_elements(by=By.TAG_NAME, value="input")
@@ -100,7 +110,7 @@ class Browser:
         Method that log in user to sk compass
         log in detail are passed automatically from .env file
 
-        :return None
+        return None
         """
         time.sleep(1)
         user_inputs = self.driver.find_elements(by=By.TAG_NAME, value="input")
@@ -117,8 +127,8 @@ class Browser:
         """
         Method that opens new tabs in Chrome
 
-        :param int tab_count: number of tabs to be opened
-        :return None
+        param int tab_count: number of tabs to be opened
+        return None
         """
         for i in range(tab_count):
             self.driver.execute_script("window.open()")
@@ -129,7 +139,7 @@ class Browser:
         """
         Method that populates self.tabs list with Chrome tab objects
 
-        :return: list self.tabs: list of opened Chrome tabs
+        return: list self.tabs: list of opened Chrome tabs
         """
         tabs_list = [window for window in self.driver.window_handles[1::]]
         self.tabs = tabs_list
@@ -139,8 +149,8 @@ class Browser:
         """
         Method that loads compass report urls in respective Chrome tabs
 
-        :param dict data: metadata dictionary, from where urls are fetched
-        :return: None
+        param dict data: metadata dictionary, from where urls are fetched
+        return: None
         """
         for i in range(len(data)):
             self.driver.switch_to.window(data[i]["tab"])

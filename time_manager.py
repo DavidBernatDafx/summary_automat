@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from decorators import log_decorator
+from time import sleep
 
 
 now = datetime.now()
@@ -11,6 +12,31 @@ year_rider = year_start.replace(month=1)
 
 
 class Dates:
+    """
+    Class that represents all needed dates for compass report forms and VCC API requests
+
+    Attributes
+    ----------
+
+    dates : dict
+        dictionary of dates for compass forms in datetime format
+    dates_vcc : dict
+        dictionary of dates for VCC API in str format
+    dates_str : dict
+        dictionary of dates for compass forms in str format
+    dates_vcc_str : dict
+        dictionary of converted dates for VCC API in str format
+
+    Methods
+    -------
+
+    get_last_bd()
+        method appends last business day to dates dict in case of yesterday is not business day
+    convert()
+        converts dates dict items to str and populates dates_str dict
+    convert_vcc()
+        converts dates_vcc items and populates dates_vcc_str dict
+    """
 
     def __init__(self):
         self.dates = {
@@ -25,18 +51,30 @@ class Dates:
             "year": str(yesterday.year),
             "month": str(yesterday.month),
             "day": str(month_start.day),
+            "month_to": str(now.month),
             "day_to": str(now.day),
         }
         self.get_last_bd()
+        self.check_time()
         self.dates_str = {}
         self.convert()
         self.dates_vcc_str = {}
         self.convert_vcc()
 
+    def __repr__(self):
+        return f"<Dates for {datetime.strftime(self.dates['yesterday'], '%d.%m.%Y')}>"
+
     @log_decorator
-    def get_last_bd(self):
+    def check_time(self):
+        hour = now.hour
+        if hour >= 20:
+            self.dates["yesterday"] += timedelta(days=1)
+            self.dates["yesterday_rider"] += timedelta(days=1)
+            self.dates["last_business_day"] += timedelta(days=1)
+
+    @log_decorator
+    def get_last_bd(self) -> datetime:
         day_name = self.dates["yesterday"].strftime("%A")
-        print(day_name)
         if day_name == "Sunday":
             self.dates["last_business_day"] = self.dates["yesterday"] - timedelta(days=2)
         elif day_name == "Saturday":
@@ -61,15 +99,21 @@ class Dates:
                                        self.dates_vcc_str["month"] +
                                        self.dates_vcc_str["day"])
         self.dates_vcc_str["end"] = (self.dates_vcc_str["year"] +
-                                     self.dates_vcc_str["month"] +
+                                     self.dates_vcc_str["month_to"] +
                                      self.dates_vcc_str["day_to"])
 
 
-def convert_duration(duration: int):
-    td = timedelta(seconds=duration)
-    return td
+# def convert_duration(duration: float):
+#     td = timedelta(seconds=int(duration))
+#     return td
 
 
-def convert_time(time: str):
+def convert_time(time: str) -> datetime:
+    """
+    Function converts str datetime objects and returns datetime objects
+
+    :param str time: datetime str
+    :return datetime : datetime
+    """
     dt_time = datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
     return dt_time
